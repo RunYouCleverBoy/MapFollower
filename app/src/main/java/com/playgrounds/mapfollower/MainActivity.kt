@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     private val locationPermissionRequest: ActivityResultLauncher<Array<String>>
     init {
-        locationPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+        locationPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             when (PermissionsRequestManager.onReturningPermissionsCall(this)) {
                 PermissionsRequestManager.MissingPermissionType.LOCATION ->
                     Toast.makeText(this, R.string.insufficientPermissions, Toast.LENGTH_LONG).show()

@@ -119,10 +119,17 @@ class LocationHandler private constructor(context: Context, private val configur
     private fun createPendingIntent(): PendingIntent {
         val geoFenceRequestCode = GEOFENCE_ID_CODE
         val intent = Intent(appContext, MapFollowerService::class.java)
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            PendingIntent.getForegroundService(appContext, geoFenceRequestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
         } else {
-            PendingIntent.getService(appContext, geoFenceRequestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            PendingIntent.getForegroundService(appContext, geoFenceRequestCode, intent, flags)
+        } else {
+            PendingIntent.getService(appContext, geoFenceRequestCode, intent, flags)
         }
     }
 
