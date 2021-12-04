@@ -15,6 +15,9 @@ import com.playgrounds.mapfollower.history.model.HistoryItem
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * Adapter for history list
+ */
 // TODO: In real life we may need to consider PagingDataAdapter
 class HistoryAdapter(private val onClick: (HistoryItem) -> Unit) : ListAdapter<HistoryItem, HistoryAdapter.Holder>(ItemDiff()) {
     class ItemDiff : DiffUtil.ItemCallback<HistoryItem>() {

@@ -6,6 +6,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.playgrounds.mapfollower.model.location.LocationHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 
+/**
+ * View model for the activity
+ */
 class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val locationWrapper = LocationHandler.get(app.applicationContext)
     val selectedEvent = MutableStateFlow<LatLng?>(null)

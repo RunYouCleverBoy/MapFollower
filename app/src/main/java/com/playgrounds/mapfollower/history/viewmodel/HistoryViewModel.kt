@@ -6,6 +6,9 @@ import com.playgrounds.mapfollower.history.model.HistoryItem
 import com.playgrounds.mapfollower.model.room.HistoryRepo
 import kotlinx.coroutines.flow.map
 
+/**
+ * View model for history list
+ */
 class HistoryViewModel(app: Application) : AndroidViewModel(app) {
     private val repository by lazy { HistoryRepo(app) }
     fun getDataFlow() = repository.subscribe().map { rows ->

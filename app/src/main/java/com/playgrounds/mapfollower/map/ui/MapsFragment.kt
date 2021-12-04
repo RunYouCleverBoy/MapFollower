@@ -24,6 +24,12 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
+/**
+ * Fragment for map.
+ *
+ * Note that it's embedded, and uses [SupportMapFragment].
+ *  Saved instance state is the SupportMapFragment responsibility
+ */
 class MapsFragment : Fragment() {
     private val mapDeferred = CompletableDeferred<GoogleMap>()
     private lateinit var viewModel: MapFragmentViewModel

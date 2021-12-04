@@ -7,6 +7,9 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 
+/**
+ * Request manager - encapsulates all the ugly logic of Google permission checking
+ */
 object PermissionsRequestManager {
     private fun missingPermissions(activity: AppCompatActivity): List<String> {
         val permissionsGross =

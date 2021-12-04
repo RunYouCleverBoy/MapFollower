@@ -18,6 +18,9 @@ import com.playgrounds.mapfollower.misc.MainViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
+/**
+ * Fragment for history list
+ */
 class HistoryFragment : Fragment() {
     private lateinit var viewModel: HistoryViewModel
     private val activityViewModel: MainViewModel by activityViewModels()
