@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Map Follower</string>
+    <string name="insufficientPermissions">Permissions not granted.</string>
+    <string name="map_tracker_notification_title">Map tracker service</string>
+    <string name="app_tracker_notification_text">Background persistence for locations</string>
+</resources>
