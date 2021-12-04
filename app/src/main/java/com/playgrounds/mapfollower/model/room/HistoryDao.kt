@@ -15,5 +15,5 @@ interface HistoryDao {
     fun getAll(): Flow<List<GeofenceHistoryEntity>>
 
     @Query("DELETE FROM geofenceevents WHERE id not in (SELECT id FROM geofenceevents ORDER BY timeStamp DESC LIMIT :exceptTopN)")
-    suspend fun trimTable(exceptTopN: Int = 300)
+    suspend fun trimTable(exceptTopN: Int)
 }

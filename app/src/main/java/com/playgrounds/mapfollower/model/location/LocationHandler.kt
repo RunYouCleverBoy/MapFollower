@@ -16,8 +16,10 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withTimeoutOrNull
 
+/**
+ * Handles all that's related to location. Geofenceing, locations, etc.
+ */
 class LocationHandler private constructor(context: Context, private val configuration: Configuration = Configuration()) {
     data class Configuration(val radius: Double = 300.0)
     data class LocationReport(val location: Location, val geoFenceAccuracyMeters: Double)
@@ -36,14 +38,11 @@ class LocationHandler private constructor(context: Context, private val configur
     suspend fun startWatchingLocations(): Boolean {
         client = LocationServices.getFusedLocationProviderClient(appContext)
         val timeout = 10 * DateUtils.SECOND_IN_MILLIS
-        val locationPromise = obtainSingleLocationAsync(timeout, client)
+        val location = obtainSingleLocation(timeout, client)
+        mutableLocationsFlow.tryEmit(location)
+        setGeofence(location)
 
-        val location = withTimeoutOrNull(2 * timeout) { locationPromise.await() }
-        return if (location != null) {
-            mutableLocationsFlow.emit(location)
-            setGeofence(location)
-            true
-        } else false
+        return true
     }
 
     /**
@@ -77,7 +76,7 @@ class LocationHandler private constructor(context: Context, private val configur
     }
 
     @Suppress("SameParameterValue", "MissingPermission")
-    private fun obtainSingleLocationAsync(timeout: Long, client: FusedLocationProviderClient): CompletableDeferred<Location> {
+    private suspend fun obtainSingleLocation(timeout: Long, client: FusedLocationProviderClient): Location {
         val deferred = CompletableDeferred<Location>()
         val request = LocationRequest.create().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setMaxWaitTime(timeout)
             .setFastestInterval(0)
@@ -98,7 +97,7 @@ class LocationHandler private constructor(context: Context, private val configur
                 mutableLocationsFlow.tryEmit(location)
             }
         }
-        return deferred
+        return deferred.await()
     }
 
     @SuppressLint("MissingPermission")

@@ -1,23 +1,22 @@
 package com.playgrounds.mapfollower.model.location
 
 import android.content.Context
-import com.playgrounds.mapfollower.model.room.GeofenceHistoryEntity
-import com.playgrounds.mapfollower.model.room.HistoryDatabase
+import com.playgrounds.mapfollower.model.room.HistoryRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
-class LocationEventSaver(appContext: Context) {
-    private val database = HistoryDatabase.getInstance(appContext)
+/**
+ * Event saver saves all events to persistence
+ */
+class LocationEventSaver(context: Context) {
     private val scope = CoroutineScope(Dispatchers.Main)
+    private val historyRepo = HistoryRepo(context.applicationContext)
 
     fun store(time: Long, latitude: Double, longitude: Double, type: Int) {
-        val entity = GeofenceHistoryEntity(0, time, latitude, longitude, type)
-        val historyDao = database.getHistoryDao()
         scope.launch(Dispatchers.IO) {
-            historyDao.insert(entity)
-            historyDao.trimTable()
+            historyRepo.save(time, longitude, latitude, type)
         }
     }
 
