@@ -14,8 +14,10 @@ class LocationEventSaver(appContext: Context) {
 
     fun store(time: Long, latitude: Double, longitude: Double, type: Int) {
         val entity = GeofenceHistoryEntity(0, time, latitude, longitude, type)
+        val historyDao = database.getHistoryDao()
         scope.launch(Dispatchers.IO) {
-            database.getHistoryDao().insert(entity)
+            historyDao.insert(entity)
+            historyDao.trimTable()
         }
     }
 

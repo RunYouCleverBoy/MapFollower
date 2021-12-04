@@ -68,7 +68,7 @@ class MapsFragment : Fragment() {
     private suspend fun listenToLocationChanges(map: GoogleMap) {
         viewModel.locationsFlow.collect { report ->
             val location = report.location
-            if (historyMarker != null) {
+            if (historyMarker == null) {
                 map.flyTo(location.toLatLng)
             }
             map.drawCircleAt(location, report.geoFenceAccuracyMeters)
