@@ -11,6 +11,6 @@ interface HistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun inset(entity: GeofenceHistoryEntity)
 
-    @Query("SELECT * FROM geofencehistoryentity ORDER BY timeStamp DESC")
+    @Query("SELECT * FROM geofenceevents ORDER BY timeStamp DESC")
     fun getAll(): Flow<List<GeofenceHistoryEntity>>
 }

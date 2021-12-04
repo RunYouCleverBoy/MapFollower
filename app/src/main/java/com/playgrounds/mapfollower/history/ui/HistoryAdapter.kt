@@ -15,6 +15,7 @@ import com.playgrounds.mapfollower.history.model.HistoryItem
 import java.text.SimpleDateFormat
 import java.util.*
 
+// TODO: In real life we may need to consider PagingDataAdapter
 class HistoryAdapter(private val onClick: (HistoryItem) -> Unit) : ListAdapter<HistoryItem, HistoryAdapter.Holder>(ItemDiff()) {
     class ItemDiff : DiffUtil.ItemCallback<HistoryItem>() {
         override fun areItemsTheSame(oldItem: HistoryItem, newItem: HistoryItem): Boolean = oldItem == newItem
