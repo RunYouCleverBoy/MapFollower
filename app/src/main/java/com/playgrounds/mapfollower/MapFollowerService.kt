@@ -19,7 +19,7 @@ class MapFollowerService : Service() {
         super.onStartCommand(intent, flags, startId)
 
         startForeground(1, createNotification())
-        if (startId == LocationWrapper.GEOFENCE_ID_CODE && intent != null) {
+        if (intent != null) {
             LocationWrapper.get(this).onGeofenceEvent(intent)
         }
         return START_NOT_STICKY
