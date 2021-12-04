@@ -3,4 +3,7 @@
     <string name="insufficientPermissions">Permissions not granted.</string>
     <string name="map_tracker_notification_title">Map tracker service</string>
     <string name="app_tracker_notification_text">Background persistence for locations</string>
+    <string name="lat_lon_format">Location: (%3.4f, %3.4f)</string>
+    <string name="location_not_available">N/A</string>
+    <string name="transition_type_content_description">Transition type icon</string>
 </resources>

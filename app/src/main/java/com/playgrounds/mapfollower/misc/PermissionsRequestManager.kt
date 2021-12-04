@@ -1,4 +1,4 @@
-package com.playgrounds.mapfollower
+package com.playgrounds.mapfollower.misc
 
 import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
 import android.Manifest.permission.ACCESS_COARSE_LOCATION

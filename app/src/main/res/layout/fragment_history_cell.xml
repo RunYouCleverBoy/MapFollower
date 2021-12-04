@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/history_date"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/history_geolocation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/history_geolocation"
+        tools:text="30.12.70 10:20" />
+
+    <TextView
+        android:id="@+id/history_geolocation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/transition_type_icon"
+        app:layout_constraintStart_toEndOf="@+id/history_date"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="31.99,35.19" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/transition_type_icon"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/transition_type_content_description"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_baseline_flight_takeoff_24"
+        app:tint="@color/teal_700" />
+</androidx.constraintlayout.widget.ConstraintLayout>

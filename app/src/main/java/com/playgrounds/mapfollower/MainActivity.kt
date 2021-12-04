@@ -9,6 +9,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.playgrounds.mapfollower.misc.MainViewModel
+import com.playgrounds.mapfollower.misc.PermissionsRequestManager
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 

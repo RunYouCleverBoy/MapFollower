@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import com.playgrounds.mapfollower.model.location.LocationWrapper
 
 // Job service is not sufficient, we do need realtime
 class MapFollowerService : Service() {

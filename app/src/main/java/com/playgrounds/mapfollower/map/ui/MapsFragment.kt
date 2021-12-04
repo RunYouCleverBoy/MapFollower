@@ -1,4 +1,4 @@
-package com.playgrounds.mapfollower
+package com.playgrounds.mapfollower.map.ui
 
 import android.annotation.SuppressLint
 import android.location.Location
@@ -16,6 +16,8 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.playgrounds.mapfollower.R
+import com.playgrounds.mapfollower.map.viewmodel.MapFragmentViewModel
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch

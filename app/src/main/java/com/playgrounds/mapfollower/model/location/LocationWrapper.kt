@@ -1,4 +1,4 @@
-package com.playgrounds.mapfollower
+package com.playgrounds.mapfollower.model.location
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
@@ -10,6 +10,7 @@ import android.os.Looper
 import android.text.format.DateUtils
 import android.util.Log
 import com.google.android.gms.location.*
+import com.playgrounds.mapfollower.MapFollowerService
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +24,7 @@ class LocationWrapper private constructor(context: Context, private val configur
 
     private lateinit var client: FusedLocationProviderClient
     private val mutableLocationsFlow = MutableSharedFlow<Location>(extraBufferCapacity = 100, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val mutableGeofenceEvent = MutableSharedFlow<GeofencingEvent>(extraBufferCapacity = 100, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     private val appContext = context.applicationContext
 
     val locationsFlow: Flow<LocationReport> = mutableLocationsFlow.map { value: Location -> LocationReport(value, configuration.radius) }
@@ -44,16 +46,21 @@ class LocationWrapper private constructor(context: Context, private val configur
      * Handles an intent and returns true if consumed the intent and handled it.
      */
     fun onGeofenceEvent(intent: Intent): Boolean {
-        with(GeofencingEvent.fromIntent(intent)) {
-            when (geofenceTransition) {
-                Geofence.GEOFENCE_TRANSITION_EXIT -> {
-                    val location = triggeringLocation
-                    Log.v(LOC_LOG_TAG, "Exiting Geofence by ${location.latitude}, ${location.longitude}")
-                    mutableLocationsFlow.tryEmit(location)
-                    setGeofence(location)
-                }
-                -1 -> return false
+        val event = GeofencingEvent.fromIntent(intent)
+        when (event.geofenceTransition) {
+            Geofence.GEOFENCE_TRANSITION_EXIT -> {
+                val location = event.triggeringLocation
+                Log.v(LOC_LOG_TAG, "Exiting Geofence by ${location.latitude}, ${location.longitude}")
+                mutableLocationsFlow.tryEmit(location)
+                mutableGeofenceEvent.tryEmit(event)
+                setGeofence(location)
             }
+            Geofence.GEOFENCE_TRANSITION_ENTER -> {
+                val location = event.triggeringLocation
+                Log.v(LOC_LOG_TAG, "Entering Geofence by ${location.latitude}, ${location.longitude}")
+                mutableGeofenceEvent.tryEmit(event)
+            }
+            -1 -> return false
         }
 
         return true
