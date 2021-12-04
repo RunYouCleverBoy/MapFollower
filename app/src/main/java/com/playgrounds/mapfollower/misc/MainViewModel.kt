@@ -2,19 +2,24 @@ package com.playgrounds.mapfollower.misc
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import com.playgrounds.mapfollower.model.location.LocationWrapper
-import kotlinx.coroutines.launch
+import com.google.android.gms.maps.model.LatLng
+import com.playgrounds.mapfollower.model.location.LocationHandler
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {
-    private val locationWrapper = LocationWrapper.get(app.applicationContext)
+    private val locationWrapper = LocationHandler.get(app.applicationContext)
+    val selectedEvent = MutableStateFlow<LatLng?>(null)
 
-    fun setupGeofence() {
-        viewModelScope.launch {
-            locationWrapper.startWatchingLocations()
-        }
+    suspend fun setupGeofence() {
+        locationWrapper.awaitLocationsPermissions()
+        locationWrapper.startWatchingLocations()
     }
 
+    fun onLocationsOkay() {
+        locationWrapper.reportPermissionsReady()
+    }
+
+    @Suppress("unused")
     fun shutdown() {
         locationWrapper.destroy()
     }

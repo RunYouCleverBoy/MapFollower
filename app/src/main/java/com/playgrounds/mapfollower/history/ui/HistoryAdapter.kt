@@ -23,7 +23,7 @@ class HistoryAdapter(private val onClick: (HistoryItem) -> Unit) : ListAdapter<H
     }
 
     class Holder(view: View, private val onClick: (HistoryItem) -> Unit) : RecyclerView.ViewHolder(view) {
-        private val timeDateFormatter = SimpleDateFormat("MM.dd HH:mm:ss", Locale.ROOT)
+        private val timeDateFormatter = SimpleDateFormat("dd.MMM HH:mm:ss", Locale.ROOT)
         private val timeStampText: TextView = view.findViewById(R.id.history_date)
         private val locationText: TextView = view.findViewById(R.id.history_geolocation)
         private val transitionTypeIcon: AppCompatImageView = view.findViewById(R.id.transition_type_icon)

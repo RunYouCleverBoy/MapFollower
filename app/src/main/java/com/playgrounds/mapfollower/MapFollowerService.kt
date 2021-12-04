@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import com.playgrounds.mapfollower.model.location.LocationWrapper
+import com.playgrounds.mapfollower.model.location.LocationHandler
 
 // Job service is not sufficient, we do need realtime
 class MapFollowerService : Service() {
@@ -21,7 +21,7 @@ class MapFollowerService : Service() {
 
         startForeground(1, createNotification())
         if (intent != null) {
-            LocationWrapper.get(this).onGeofenceEvent(intent)
+            LocationHandler.get(this).onGeofenceEvent(intent)
         }
         return START_NOT_STICKY
     }

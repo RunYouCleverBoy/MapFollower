@@ -18,23 +18,27 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withTimeoutOrNull
 
-class LocationWrapper private constructor(context: Context, private val configuration: Configuration = Configuration()) {
+class LocationHandler private constructor(context: Context, private val configuration: Configuration = Configuration()) {
     data class Configuration(val radius: Double = 300.0)
     data class LocationReport(val location: Location, val geoFenceAccuracyMeters: Double)
 
+    private val appContext = context.applicationContext
     private lateinit var client: FusedLocationProviderClient
     private val mutableLocationsFlow = MutableSharedFlow<Location>(extraBufferCapacity = 100, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    private val mutableGeofenceEvent = MutableSharedFlow<GeofencingEvent>(extraBufferCapacity = 100, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    private val appContext = context.applicationContext
+    private val databaseSaver = LocationEventSaver(appContext)
+    private val permissionsClearForLocations = CompletableDeferred<Boolean>()
 
     val locationsFlow: Flow<LocationReport> = mutableLocationsFlow.map { value: Location -> LocationReport(value, configuration.radius) }
+
+    suspend fun awaitLocationsPermissions() = permissionsClearForLocations.await()
+    fun reportPermissionsReady() = permissionsClearForLocations.complete(true)
 
     suspend fun startWatchingLocations(): Boolean {
         client = LocationServices.getFusedLocationProviderClient(appContext)
         val timeout = 10 * DateUtils.SECOND_IN_MILLIS
         val locationPromise = obtainSingleLocationAsync(timeout, client)
 
-        val location = withTimeoutOrNull(timeout) { locationPromise.await() }
+        val location = withTimeoutOrNull(2 * timeout) { locationPromise.await() }
         return if (location != null) {
             mutableLocationsFlow.emit(location)
             setGeofence(location)
@@ -47,33 +51,37 @@ class LocationWrapper private constructor(context: Context, private val configur
      */
     fun onGeofenceEvent(intent: Intent): Boolean {
         val event = GeofencingEvent.fromIntent(intent)
-        when (event.geofenceTransition) {
+        when (val type = event.geofenceTransition) {
             Geofence.GEOFENCE_TRANSITION_EXIT -> {
                 val location = event.triggeringLocation
                 Log.v(LOC_LOG_TAG, "Exiting Geofence by ${location.latitude}, ${location.longitude}")
                 mutableLocationsFlow.tryEmit(location)
-                mutableGeofenceEvent.tryEmit(event)
+                databaseSaver.store(location.time, location.latitude, location.longitude, type)
                 setGeofence(location)
             }
             Geofence.GEOFENCE_TRANSITION_ENTER -> {
                 val location = event.triggeringLocation
                 Log.v(LOC_LOG_TAG, "Entering Geofence by ${location.latitude}, ${location.longitude}")
-                mutableGeofenceEvent.tryEmit(event)
+                databaseSaver.store(location.time, location.latitude, location.longitude, type)
             }
             -1 -> return false
         }
+
 
         return true
     }
 
     fun destroy() {
+        databaseSaver.shutdown()
         LocationServices.getGeofencingClient(appContext).removeGeofences(createPendingIntent())
     }
 
     @Suppress("SameParameterValue", "MissingPermission")
     private fun obtainSingleLocationAsync(timeout: Long, client: FusedLocationProviderClient): CompletableDeferred<Location> {
         val deferred = CompletableDeferred<Location>()
-        val request = LocationRequest.create().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setMaxWaitTime(timeout).setNumUpdates(1)
+        val request = LocationRequest.create().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setMaxWaitTime(timeout)
+            .setFastestInterval(0)
+            .setNumUpdates(1)
 
         client.requestLocationUpdates(request, object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
@@ -96,7 +104,6 @@ class LocationWrapper private constructor(context: Context, private val configur
     @SuppressLint("MissingPermission")
     private fun setGeofence(around: Location, radius: Float = configuration.radius.toFloat()) {
         val request = GeofencingRequest.Builder()
-            .setInitialTrigger(Geofence.GEOFENCE_TRANSITION_EXIT)
             .addGeofence(
                 Geofence.Builder()
                     .setCircularRegion(around.latitude, around.longitude, radius)
@@ -126,7 +133,7 @@ class LocationWrapper private constructor(context: Context, private val configur
         const val LOC_LOG_TAG = "Location"
 
         @Synchronized
-        fun get(context: Context) = instance ?: LocationWrapper(context).also { instance = it }
-        private var instance: LocationWrapper? = null
+        fun get(context: Context) = instance ?: LocationHandler(context).also { instance = it }
+        private var instance: LocationHandler? = null
     }
 }

@@ -11,14 +11,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.playgrounds.mapfollower.misc.MainViewModel
 import com.playgrounds.mapfollower.misc.PermissionsRequestManager
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 
 @Suppress("ReplaceGetOrSet")
 class MainActivity : AppCompatActivity() {
     private val locationPermissionRequest: ActivityResultLauncher<Array<String>>
-    private val permissionsClearForLocations = CompletableDeferred<Boolean>()
-
     init {
         locationPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             when (PermissionsRequestManager.onReturningPermissionsCall(this)) {
@@ -26,7 +23,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, R.string.insufficientPermissions, Toast.LENGTH_LONG).show()
                 PermissionsRequestManager.MissingPermissionType.BACKGROUND_LOCATION -> requestBackgroundLocation()
                 PermissionsRequestManager.MissingPermissionType.NONE -> {
-                    permissionsClearForLocations.complete(true)
+                    viewModel.onLocationsOkay()
                 }
             }
         }
@@ -43,11 +40,10 @@ class MainActivity : AppCompatActivity() {
         if (permissions.isNotEmpty()) {
             locationPermissionRequest.launch(permissions.toTypedArray())
         } else {
-            permissionsClearForLocations.complete(true)
+            viewModel.onLocationsOkay()
         }
 
         lifecycleScope.launch {
-            permissionsClearForLocations.await()
             viewModel.setupGeofence()
         }
     }

@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface HistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun inset(entity: GeofenceHistoryEntity)
+    suspend fun insert(entity: GeofenceHistoryEntity)
 
-    @Query("SELECT * FROM geofenceevents ORDER BY timeStamp DESC")
+    @Query("SELECT * FROM geofenceevents ORDER BY timeStamp DESC LIMIT 300")
     fun getAll(): Flow<List<GeofenceHistoryEntity>>
 }
