@@ -24,7 +24,7 @@ class MapsFragment : Fragment() {
     private val mapDeferred = CompletableDeferred<GoogleMap>()
     private lateinit var viewModel: MapFragmentViewModel
     private var accuracyCircle: Circle? = null
-    private var currMarker: Marker? = null
+    private var historyMarker: Marker? = null
 
     @SuppressLint("MissingPermission")
     private val callback = OnMapReadyCallback { googleMap ->
@@ -57,9 +57,9 @@ class MapsFragment : Fragment() {
         }
     }
 
-    private fun GoogleMap.drawCurrMarkerAt(latLng: LatLng, title: String) {
-        currMarker?.remove()
-        currMarker = addMarker(MarkerOptions().position(latLng).title(title))
+    private fun GoogleMap.drawHistoryMarkAt(latLng: LatLng, title: String) {
+        historyMarker?.remove()
+        historyMarker = addMarker(MarkerOptions().position(latLng).title(title))
     }
 
     private fun GoogleMap.flyTo(latLng: LatLng) {
@@ -71,9 +71,10 @@ class MapsFragment : Fragment() {
     private val Location.toLatLng get() = LatLng(latitude, longitude)
     private fun GoogleMap.drawCircleAt(location: Location, geoFenceAccuracyMeters: Double) {
         accuracyCircle?.remove()
+        val context = requireContext()
         val circleOptions = CircleOptions().center(location.toLatLng).radius(geoFenceAccuracyMeters)
-            .fillColor(ContextCompat.getColor(requireContext(), R.color.geofence_body))
-            .strokeColor(ContextCompat.getColor(requireContext(), R.color.geofence_stroke))
+            .fillColor(ContextCompat.getColor(context, R.color.geofence_body))
+            .strokeColor(ContextCompat.getColor(context, R.color.geofence_stroke))
             .strokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1f, resources.displayMetrics))
 
         accuracyCircle = addCircle(circleOptions)
